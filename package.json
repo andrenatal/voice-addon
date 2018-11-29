@@ -1,0 +1,64 @@
+{
+  "name": "voice-addon",
+  "display_name": "Voice Addon",
+  "version": "1.0.0",
+  "description": "Handsfree voice addon Mozilla IoT Gateway",
+  "author": "André Natal",
+  "main": "index.js",
+  "keywords": [
+    "mozilla",
+    "iot",
+    "adapter",
+    "example"
+  ],
+  "homepage": "https://github.com/andrenatal/example-adapter",
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andrenatal/example-adapter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andrenatalt/example-adapter/issues"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1"
+  },
+  "files": [
+    "LICENSE",
+    "SHA256SUMS",
+    "voice-adapter.js",
+    "index.js"
+  ],
+  "moziot": {
+    "api": {
+      "min": 1,
+      "max": 2
+    },
+    "plugin": true,
+    "exec": "{nodeLoader} {path}",
+    "config" : {
+      "keyword" : "jarvis"
+    },
+    "schema": {
+      "type": "object",
+      "description": "Configuration for sunset and sunrise",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "Token. (e.g. CET)"
+        },
+        "keyword": {
+          "type": "string",
+          "description": "Timezone. (e.g. CET)"
+        }
+      },
+      "required": [
+        "token",
+        "keyword"
+      ]
+    }
+  },
+  "dependencies": {
+    "mqtt": "^2.18.8"
+  }
+}
