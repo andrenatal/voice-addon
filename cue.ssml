@@ -1,0 +1,4 @@
+<speak>
+     Now let's train your wake word.<break time="1s"/> After I stop talking, you'll hear three bips. Say your wake word right after each bip. You'll have two seconds to say it. It's important to do this in a very quiet room. If you are not ready yet, or want to stop the training, just push the voice controller button in the gateway home page to turn it off. <break time=".5s"/><amazon:effect
+     name="shout">"Let's start recording!"</amazon:effect>
+</speak>

@@ -1,7 +1,7 @@
 {
   "name": "voice-addon",
   "display_name": "Voice Addon",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Handsfree voice addon Mozilla IoT Gateway",
   "author": "André Natal",
   "main": "index.js",
@@ -11,7 +11,7 @@
     "adapter",
     "example"
   ],
-  "homepage": "https://github.com/andrenatal/example-adapter",
+  "homepage": "https://github.com/andrenatal/voiceaddon",
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
@@ -41,15 +41,15 @@
     },
     "schema": {
       "type": "object",
-      "description": "Configuration for sunset and sunrise",
+      "description": "Configuration for your voice addon",
       "properties": {
         "token": {
           "type": "string",
-          "description": "Token. (e.g. CET)"
+          "description": "Navigate to Settings -> Developer -> Create local authorizaion -> Allow. Then copy the presented JSON Web Token in this field"
         },
         "keyword": {
           "type": "string",
-          "description": "Timezone. (e.g. CET)"
+          "description": "Type your desired keyword. Use only characteres from a to z. After clicking Apply, add your Voice Controller to your Things list, and push the button to start the training of your keyword."
         }
       },
       "required": [

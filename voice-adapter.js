@@ -11,6 +11,7 @@
 let Adapter, Device, Property, token, keyword;
 const mqtt = require('mqtt');
 const https = require('https');
+const spawn = require('child_process').spawn;
 
 try {
   Adapter = require('../adapter');
@@ -44,6 +45,34 @@ class ActiveProperty extends Property {
    * the value passed in.
    */
   setValue(value) {
+    if (value) {
+      // spawn training
+      console.log('spawn training');
+      this.training_process = spawn('python2', ['script_recording.py', keyword],
+                                    {cwd:
+                                  '/home/pi/.mozilla-iot/addons/voice-addon/'});
+      this.training_process.stdout.setEncoding('utf8');
+      this.training_process.stdout.on('data', (data) => {
+        console.log(`DATA: ${data.toString()}`);
+      });
+      this.training_process.stderr.on('data', (data) => {
+        console.log(`ERROR: ${data.toString()}`);
+      });
+      this.training_process.on('close', (code) => {
+        console.log(`process exit code ${code}`);
+        this.setCachedValue(false);
+        this.device.notifyPropertyChanged(this);
+      });
+    } else {
+      console.log('shutdown training');
+      // shutdown training
+      if (this.training_process) {
+        this.training_process.stderr.pause();
+        this.training_process.stdout.pause();
+        this.training_process.stdin.pause();
+        this.training_process.kill('SIGTERM');
+      }
+    }
     return new Promise((resolve, reject) => {
       super.setValue(value).then((updatedValue) => {
         resolve(updatedValue);
@@ -68,11 +97,9 @@ class VoiceDevice extends Device {
                                           propertyDescription);
       this.properties.set(propertyName, property);
     }
-
     this.mqttListener = new MqttListener();
     this.mqttListener.connect();
   }
-
 }
 
 class MqttListener {
@@ -82,11 +109,14 @@ class MqttListener {
     this.client = mqtt.connect('mqtt://127.0.0.1');
     this.HERMES_KWS = 'hermes/hotword/default/detected';
     this.HERMES_ASR = 'hermes/asr/textCaptured';
+    setInterval(this.call_things_api.bind(this), 10000);
+    this.things = [];
   }
 
   connect() {
     this.client.on('connect', function() {
       console.log('conectado');
+      this.call_things_api();
       this.client.subscribe(this.HERMES_KWS, function(err) {
         if (err) console.log('mqtt error hermes/hotword/default/detected');
       });
@@ -97,7 +127,7 @@ class MqttListener {
 
     this.client.on('message', function(topic, message) {
       if (topic === this.HERMES_ASR) {
-        console.log('mensagem no mqtt no addon' + message);
+        console.log(`mensagem no mqtt no addon ${message}`);
         this.call_commands_api(JSON.parse(message));
       }
     }.bind(this));
@@ -107,13 +137,44 @@ class MqttListener {
     const postData = JSON.stringify({
       text: command.text,
     });
-    console.log(`top ${postData} ${command}`);
+    this.doHTTPRequest('/commands', postData);
+  }
 
+  call_things_api() {
+    this.doHTTPRequest('/things', null, (response) => {
+      const json_things = JSON.parse(response);
+      const temp_things = [];
+      for (const i in json_things) {
+        for (const key in json_things[i]) {
+          if (key === 'name') {
+            temp_things.push(json_things[i][key]);
+          }
+        }
+      }
+
+      if (JSON.stringify(temp_things.sort()) !== JSON.stringify(this.things.sort())) {
+        console.log('different set of things. retrain: ');
+        const train_json = {
+          operations: [['addFromVanilla', {thing: []}]],
+        };
+        train_json.operations[0][1].thing = temp_things;
+        this.things = temp_things;
+        this.client.publish('hermes/injection/perform', JSON.stringify(train_json));
+      }
+    });
+  }
+
+  doHTTPRequest(command, postData, callback) {
+    let method = 'POST';
+    if (postData === null) {
+      postData = '';
+      method = 'GET';
+    }
     const options = {
       hostname: '127.0.0.1',
       port: 4443,
-      path: '/commands',
-      method: 'POST',
+      path: `${command}`,
+      method: `${method}`,
       headers: {
         Accept: 'application/json',
         Authorization: `Bearer ${token}`,
@@ -123,13 +184,15 @@ class MqttListener {
     };
 
     const req = https.request(options, (res) => {
-      console.log(`STATUS: ${res.statusCode}`);
+      let chunks = '';
       res.setEncoding('utf8');
       res.on('data', (chunk) => {
-        console.log(`BODY: ${chunk}`);
+        chunks += chunk;
       });
       res.on('end', () => {
-        console.log('No more data in response.');
+        if (callback) {
+          callback(chunks);
+        }
       });
     });
 
@@ -138,7 +201,6 @@ class MqttListener {
     });
 
     // write data to request body
-    console.log(`requesting ${postData}`);
     req.write(postData);
     req.end();
   }
