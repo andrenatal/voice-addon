@@ -129,6 +129,9 @@ class MqttListener {
       if (topic === this.HERMES_ASR) {
         console.log(`mensagem no mqtt no addon ${message}`);
         this.call_commands_api(JSON.parse(message));
+      } else if (topic === this.HERMES_KWS) {
+        spawn('aplay', ['end_spot.wav'],
+              {cwd: '/home/pi/.mozilla-iot/addons/voice-addon/'});
       }
     }.bind(this));
   }
