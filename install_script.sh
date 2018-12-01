@@ -10,4 +10,3 @@ sudo apt-get install -y snips-platform-voice snips-injection python-numpy python
 copia o assistant default para: /usr/share/snips/assistant (atentar para permissao correta!)
 
 npm install mqtt --save
-pip install utils
