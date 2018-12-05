@@ -40,7 +40,7 @@
 # session_timeout = 15
 # lambda_timeout = 5
 # retry_count = 3
-# sound_feedback_disabled_default = false
+sound_feedback_disabled_default = true
 
 [snips-hotword]
  model = "/home/pi/.mozilla-iot/addons/voice-addon/personal_kws/"
