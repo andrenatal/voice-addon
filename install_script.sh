@@ -8,5 +8,8 @@ sudo apt-key adv --keyserver pgp.mit.edu --recv-keys D4F50CDCA10A2849  (se falha
 sudo apt-get install -y snips-platform-voice snips-injection python-numpy python-pyaudio python-soundfile
 
 copia o assistant default para: /usr/share/snips/assistant (atentar para permissao correta!)
+criar folder /home/pi/.mozilla-iot/addons/voice-addon/personal_kws/
 
 npm install mqtt --save
+
+sudo systemctl restart snips-hotword; sudo systemctl restart snips-dialogue
