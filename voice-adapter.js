@@ -28,6 +28,8 @@ try {
   Property = gwa.Property;
 }
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 class ActiveProperty extends Property {
   constructor(device, name, propertyDescription) {
     super(device, name, propertyDescription);
