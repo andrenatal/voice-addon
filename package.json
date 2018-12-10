@@ -45,11 +45,11 @@
       "properties": {
         "token": {
           "type": "string",
-          "description": "Navigate to Settings -> Developer -> Create local authorizaion -> Allow. Then copy the presented JSON Web Token in this field"
+          "description": "Navigate to Settings -> Developer -> Create local authorization -> Allow. Then copy the presented JSON Web Token in this field"
         },
         "keyword": {
           "type": "string",
-          "description": "Type your desired keyword. Use only characteres from a to z. After clicking Apply, add your Voice Controller to your Things list, and push the button to start the training of your keyword."
+          "description": "Type your desired keyword. Use only characters from a to z. After clicking Apply, add your Voice Controller to your Things list, and push the button to start the training of your keyword."
         }
       },
       "required": [
