@@ -303,6 +303,7 @@ class VoiceAdapter extends Adapter {
 }
 
 function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
+  checkInstallation();
   token = manifest.moziot.config.token;
   keyword = manifest.moziot.config.keyword;
   const adapter = new VoiceAdapter(addonManager, manifest.name);
@@ -322,6 +323,21 @@ function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
     },
   });
   adapter.handleDeviceAdded(device);
+}
+
+function checkInstallation() {
+  const installation_checker_process = spawn('dpkg-query', ['-s', 'snips-platform-voice']);
+  installation_checker_process.stdout.setEncoding('utf8');
+  installation_checker_process.stderr.on('data', () => {
+    const snips_installation = spawn('bash', ['install_script.sh'],
+                                     {cwd: '/home/pi/.mozilla-iot/addons/voice-addon/'});
+    snips_installation.stdout.on('data', (data) => {
+      console.log(`DATA snips_installation: ${data.toString()}`);
+    });
+    snips_installation.stderr.on('data', (data) => {
+      console.log(`Error executing install_script.sh ${data}`);
+    });
+  });
 }
 
 module.exports = loadVoiceAdapter;

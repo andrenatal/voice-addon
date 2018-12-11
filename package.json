@@ -36,8 +36,8 @@
     },
     "plugin": true,
     "exec": "{nodeLoader} {path}",
-    "config" : {
-      "keyword" : "jarvis"
+    "config": {
+      "keyword": "jarvis"
     },
     "schema": {
       "type": "object",
