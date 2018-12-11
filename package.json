@@ -27,7 +27,11 @@
     "LICENSE",
     "SHA256SUMS",
     "voice-adapter.js",
-    "index.js"
+    "index.js",
+    "install_script.sh",
+    "end_spot.wav",
+    "script_recording.py",
+    "node_modules"
   ],
   "moziot": {
     "api": {
