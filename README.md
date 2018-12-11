@@ -1,6 +1,6 @@
 voice-addon
 ===========
-
+[![Build Status](https://travis-ci.org/andrenatal/voice-addon.svg?branch=master)](https://travis-ci.org/andrenatal/voice-addon)
 - `cd ~/.mozilla-iot/addons`
 - `git clone https://github.com/andrenatal/voice-addon`
 - `cd voice-addon`

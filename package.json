@@ -11,14 +11,14 @@
     "adapter",
     "example"
   ],
-  "homepage": "https://github.com/andrenatal/voiceaddon",
+  "homepage": "https://github.com/andrenatal/voice-addon",
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/andrenatal/example-adapter.git"
+    "url": "https://github.com/andrenatal/voice-addon.git"
   },
   "bugs": {
-    "url": "https://github.com/andrenatalt/example-adapter/issues"
+    "url": "https://github.com/andrenatal/voice-addon/issues"
   },
   "devDependencies": {
     "eslint": "^4.19.1"
