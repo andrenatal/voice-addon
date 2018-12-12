@@ -38,9 +38,11 @@ class ActiveProperty extends Property {
     if (value) {
       // spawn training
       console.log('spawn training');
-      this.training_process = spawn('python2', ['script_recording.py', keyword],
-                                    {cwd:
-                                  '/home/pi/.mozilla-iot/addons/voice-addon/'});
+      this.training_process = spawn(
+        'python2',
+        ['script_recording.py', keyword],
+        {cwd: __dirname}
+      );
       this.training_process.stdout.setEncoding('utf8');
       this.training_process.stdout.on('data', (data) => {
         console.log(`DATA: ${data.toString()}`);
@@ -93,7 +95,6 @@ class VoiceDevice extends Device {
 }
 
 class MqttListener {
-
   constructor() {
     // connect to snips mqtt
     this.client = mqtt.connect('mqtt://127.0.0.1');
@@ -124,8 +125,11 @@ class MqttListener {
         console.log(`mensagem no mqtt no addon ${message}`);
         this.call_commands_api(JSON.parse(message));
       } else if (topic === this.HERMES_KWS) {
-        spawn('aplay', ['-D', 'default:CARD=USB', 'end_spot.wav'],
-              {cwd: '/home/pi/.mozilla-iot/addons/voice-addon/'});
+        spawn(
+          'aplay',
+          ['-D', 'default:CARD=USB', 'end_spot.wav'],
+          {cwd: __dirname}
+        );
       }
     }.bind(this));
   }
@@ -331,7 +335,7 @@ function checkInstallation() {
     const snips_installation = spawn(
       'bash',
       ['install_script.sh'],
-      {cwd: '/home/pi/.mozilla-iot/addons/voice-addon/'}
+      {cwd: __dirname}
     );
     snips_installation.stdout.on('data', (data) => {
       console.log(`DATA snips_installation: ${data.toString()}`);
