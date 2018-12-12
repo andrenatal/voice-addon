@@ -44,7 +44,8 @@
     "plugin": true,
     "exec": "{nodeLoader} {path}",
     "config": {
-      "keyword": "jarvis"
+      "keyword": "jarvis",
+      "card": "default:CARD=USB"
     },
     "schema": {
       "type": "object",
@@ -57,6 +58,10 @@
         "keyword": {
           "type": "string",
           "description": "Type your desired keyword. Use only characters from a to z. After clicking Apply, add your Voice Controller to your Things list, and push the button to start the training of your keyword."
+        },
+        "card": {
+          "type": "string",
+          "description": "Default sound card to use for aplay."
         }
       },
       "required": [

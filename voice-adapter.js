@@ -16,7 +16,7 @@ const {Adapter, Device, Property} = require('gateway-addon');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-let token, keyword;
+let token, keyword, card;
 
 class ActiveProperty extends Property {
   constructor(device, name, propertyDescription) {
@@ -127,7 +127,7 @@ class MqttListener {
       } else if (topic === this.HERMES_KWS) {
         spawn(
           'aplay',
-          ['-D', 'default:CARD=USB', 'end_spot.wav'],
+          ['-D', card, 'end_spot.wav'],
           {cwd: __dirname}
         );
       }
@@ -306,6 +306,7 @@ function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
   checkInstallation();
   token = manifest.moziot.config.token;
   keyword = manifest.moziot.config.keyword;
+  card = manifest.moziot.config.card;
   const adapter = new VoiceAdapter(addonManager, manifest.name);
   const device = new VoiceDevice(adapter, 'voice-controller', {
     name: 'voice-controller',
@@ -326,23 +327,16 @@ function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
 }
 
 function checkInstallation() {
-  const installation_checker_process = spawn(
-    'dpkg-query',
-    ['-s', 'snips-platform-voice']
+  const snips_installation = spawn(
+    'bash',
+    ['install_script.sh'],
+    {cwd: __dirname}
   );
-  installation_checker_process.stdout.setEncoding('utf8');
-  installation_checker_process.stderr.on('data', () => {
-    const snips_installation = spawn(
-      'bash',
-      ['install_script.sh'],
-      {cwd: __dirname}
-    );
-    snips_installation.stdout.on('data', (data) => {
-      console.log(`DATA snips_installation: ${data.toString()}`);
-    });
-    snips_installation.stderr.on('data', (data) => {
-      console.log(`Error executing install_script.sh ${data}`);
-    });
+  snips_installation.stdout.on('data', (data) => {
+    console.log(`DATA snips_installation: ${data.toString()}`);
+  });
+  snips_installation.stderr.on('data', (data) => {
+    console.log(`Error executing install_script.sh ${data}`);
   });
 }
 
