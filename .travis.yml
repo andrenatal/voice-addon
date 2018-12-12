@@ -5,11 +5,12 @@ script:
 - npm install
 before_deploy:
 - bash package.sh
+- export RELEASE_PKG=$(ls voice-addon-*.tgz)
 deploy:
   provider: releases
   api_key:
     secure: o+IbuFvLDVjySFTrJrELgxLAJt4CV94L6SOX134igRlJnk6+p653u+MwfyNqyUsIMzJJeNOzkd1z4S7RVMgIFKTUrZfbhfWGvypsqakHMOa5sRH/eRFzE67O/GsO+gl3PVmKwVqCBgoaRSngTQdUzny9JL3e3OvCEy4c/7p+C5nIFCGedkLJaJRM2P0oewXivrxcD1FQBs53k5jJI8ui5ooaX1eJdkC1tPpcOZiAmHq/Hx4VkYQnQWPLNxypV25X/4qzCwkqBQVjXg5hMFPG8hPs8d8mJaSJ4XRPhS+Anh8uv1swi1/GlVpFZ+3t/D2gu+mC7F2h93NyKcA+IOHwAzMr681i4uMCf84mW/Ah8kz/IbLnOEPJIZZjqjM1tFmKuz2Yv2XOVEjq7DXx8+7TWLvI6OgQSlhwNT7cjbtRrcQluRMsyhX4irldXTgL6TocUnGmPeG2D4UOy6RhLOD/9+cvpWYhT9MLrOb3Yj85dPozc+0v45lv1b4kATtoBkyh2c3jjaUT05aS9X9L1lK2baVS0isw4yhBChp0B7u6eXBMSLaIEg2S7Ns9n15XSqoPZWZNMD5jiX1TtsDFVnTEt14ddbmCqA1BSXELwWDFQndefe2fUbw/4tm0gLdPRORHLDJYK7SHHqysMNEsA0TGy8fx6DuYfGAYm41+fcsO8hc=
-  file: voice-addon-*.tgz
+  file: "${RELEASE_PKG}"
   skip_cleanup: true
   on:
     repo: andrenatal/voice-addon
