@@ -1,5 +1,5 @@
 /**
- * example-adapter.js - Example adapter.
+ * voice-adapter.js - Voice adapter.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,27 +8,15 @@
 
 'use strict';
 
-let Adapter, Device, Property, token, keyword;
 const mqtt = require('mqtt');
 const https = require('https');
 const spawn = require('child_process').spawn;
 
-try {
-  Adapter = require('../adapter');
-  Device = require('../device');
-  Property = require('../property');
-} catch (e) {
-  if (e.code !== 'MODULE_NOT_FOUND') {
-    throw e;
-  }
+const {Adapter, Device, Property} = require('gateway-addon');
 
-  const gwa = require('gateway-addon');
-  Adapter = gwa.Adapter;
-  Device = gwa.Device;
-  Property = gwa.Property;
-}
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+let token, keyword;
 
 class ActiveProperty extends Property {
   constructor(device, name, propertyDescription) {
@@ -120,10 +108,14 @@ class MqttListener {
       console.log('conectado');
       this.call_things_api();
       this.client.subscribe(this.HERMES_KWS, function(err) {
-        if (err) console.log('mqtt error hermes/hotword/default/detected');
+        if (err) {
+          console.log('mqtt error hermes/hotword/default/detected');
+        }
       });
       this.client.subscribe(this.HERMES_ASR, function(err) {
-        if (err) console.log('mqtt error hermes/asr/textCaptured');
+        if (err) {
+          console.log('mqtt error hermes/asr/textCaptured');
+        }
       });
     }.bind(this));
 
@@ -157,14 +149,16 @@ class MqttListener {
         }
       }
 
-      if (JSON.stringify(temp_things.sort()) !== JSON.stringify(this.things.sort())) {
+      if (JSON.stringify(temp_things.sort()) !==
+          JSON.stringify(this.things.sort())) {
         console.log('different set of things. retrain: ');
         const train_json = {
           operations: [['addFromVanilla', {thing: []}]],
         };
         train_json.operations[0][1].thing = temp_things;
         this.things = temp_things;
-        this.client.publish('hermes/injection/perform', JSON.stringify(train_json));
+        this.client.publish('hermes/injection/perform',
+                            JSON.stringify(train_json));
       }
     });
   }
@@ -328,11 +322,17 @@ function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
 }
 
 function checkInstallation() {
-  const installation_checker_process = spawn('dpkg-query', ['-s', 'snips-platform-voice']);
+  const installation_checker_process = spawn(
+    'dpkg-query',
+    ['-s', 'snips-platform-voice']
+  );
   installation_checker_process.stdout.setEncoding('utf8');
   installation_checker_process.stderr.on('data', () => {
-    const snips_installation = spawn('bash', ['install_script.sh'],
-                                     {cwd: '/home/pi/.mozilla-iot/addons/voice-addon/'});
+    const snips_installation = spawn(
+      'bash',
+      ['install_script.sh'],
+      {cwd: '/home/pi/.mozilla-iot/addons/voice-addon/'}
+    );
     snips_installation.stdout.on('data', (data) => {
       console.log(`DATA snips_installation: ${data.toString()}`);
     });

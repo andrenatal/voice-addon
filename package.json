@@ -2,14 +2,17 @@
   "name": "voice-addon",
   "display_name": "Voice Addon",
   "version": "0.0.1",
-  "description": "Handsfree voice addon Mozilla IoT Gateway",
+  "description": "Hands-free voice addon Mozilla IoT Gateway",
   "author": "André Natal",
   "main": "index.js",
+  "scripts": {
+    "lint": "eslint ."
+  },
   "keywords": [
     "mozilla",
     "iot",
     "adapter",
-    "example"
+    "voice"
   ],
   "homepage": "https://github.com/andrenatal/voice-addon",
   "license": "MPL-2.0",
@@ -21,7 +24,7 @@
     "url": "https://github.com/andrenatal/voice-addon/issues"
   },
   "devDependencies": {
-    "eslint": "^4.19.1"
+    "eslint": "^5.10.0"
   },
   "files": [
     "LICENSE",
@@ -35,7 +38,7 @@
   ],
   "moziot": {
     "api": {
-      "min": 1,
+      "min": 2,
       "max": 2
     },
     "plugin": true,
