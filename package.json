@@ -1,7 +1,7 @@
 {
   "name": "voice-addon",
   "display_name": "Voice Addon",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Hands-free voice addon Mozilla IoT Gateway",
   "author": "André Natal",
   "main": "index.js",
