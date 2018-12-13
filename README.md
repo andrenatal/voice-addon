@@ -6,7 +6,6 @@ voice-addon
 - `cd voice-addon`
 - `npm install`
 - `./install_script.sh`
-- Maybe restart your Pi here
 - Open up https://gateway.local (or your gateway's url if different) in a browser
 - Navigate to Settings > Add-ons
 - Click configure on Voice Addon, follow instructions to get token
