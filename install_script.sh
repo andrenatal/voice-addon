@@ -36,7 +36,7 @@ install_pkg() {
 
 sudo unzip -o assistant_proj.zip -d /usr/share/snips
 cp -r personal_kws_tpl personal_kws
-sudo cp snips.toml /etc/
+sudo rm -rf /etc/snips.toml
 sudo cp asound.conf /etc/asound.conf
 install_pkg "snips-injection"
 
@@ -45,6 +45,8 @@ for pkg in ${required_packages[@]}; do
         install_pkg "$pkg"
     fi
 done
+
+sudo cp snips.toml /etc/
 
 sudo systemctl restart snips-hotword
 sudo systemctl restart snips-dialogue
