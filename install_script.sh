@@ -35,7 +35,7 @@ install_pkg() {
 }
 
 sudo unzip -o assistant_proj.zip -d /usr/share/snips
-sudo cp -r personal_kws_tpl personal_kws
+cp -r personal_kws_tpl personal_kws
 sudo cp snips.toml /etc/
 sudo cp asound.conf /etc/asound.conf
 install_pkg "snips-injection"
