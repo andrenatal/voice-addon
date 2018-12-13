@@ -1,8 +1,8 @@
 {
   "name": "voice-addon",
-  "display_name": "Voice Addon",
-  "version": "0.0.2",
-  "description": "Hands-free voice addon Mozilla IoT Gateway",
+  "display_name": "Voice Control",
+  "version": "0.0.3",
+  "description": "Hands-free voice addon with personalized keyword and local voice processing.",
   "author": "André Natal",
   "main": "index.js",
   "scripts": {
@@ -34,7 +34,12 @@
     "install_script.sh",
     "end_spot.wav",
     "script_recording.py",
-    "node_modules"
+    "node_modules",
+    "assistant_proj.zip",
+    "snips.toml",
+    "asound.conf",
+    "utils.py",
+    "start.wav"
   ],
   "moziot": {
     "api": {
@@ -44,8 +49,7 @@
     "plugin": true,
     "exec": "{nodeLoader} {path}",
     "config": {
-      "keyword": "jarvis",
-      "card": "default:CARD=USB"
+      "keyword": "jarvis"
     },
     "schema": {
       "type": "object",
@@ -58,10 +62,6 @@
         "keyword": {
           "type": "string",
           "description": "Type your desired keyword. Use only characters from a to z. After clicking Apply, add your Voice Controller to your Things list, and push the button to start the training of your keyword."
-        },
-        "card": {
-          "type": "string",
-          "description": "Default sound card to use for aplay."
         }
       },
       "required": [

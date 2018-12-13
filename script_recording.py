@@ -31,7 +31,7 @@ MAX_DIFFERENCE_DURATION = 0.3
 DATE_FORMAT = '%Y_%m_%dT%H_%M_%S'
 
 def play_audio_file(filename):
-	return subprocess.Popen(['aplay', '-D', 'default:CARD=USB', filename], cwd='/home/pi/.mozilla-iot/addons/voice-addon')
+	return subprocess.Popen(['aplay', filename], cwd='/home/pi/.mozilla-iot/addons/voice-addon')
 
 def record_one(directory, i):
     dest_path = os.path.join(directory, "{0}.wav".format(i))
@@ -42,7 +42,7 @@ def record_one(directory, i):
     time.sleep(.5)
     stream = audio.open(format=FORMAT, channels=CHANNELS,
                         rate=RATE, input=True,
-                        frames_per_buffer=CHUNK, input_device_index=2)
+                        frames_per_buffer=CHUNK)
     print "recording..."
     frames = []
 

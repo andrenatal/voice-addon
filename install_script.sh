@@ -4,7 +4,6 @@ set -e
 
 required_packages=(
     snips-platform-voice
-    snips-injection
     python-numpy
     python-pyaudio
     python-soundfile
@@ -20,14 +19,14 @@ run_update() {
         fi
 
         sudo bash -c 'echo "deb https://raspbian.snips.ai/$(lsb_release -cs) stable main" > /etc/apt/sources.list.d/snips.list'
-        sudo apt-key adv --keyserver pgp.mit.edu --recv-keys D4F50CDCA10A2849
+        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D4F50CDCA10A2849
         sudo apt-get update
         updated=1
     fi
 }
 
 check_pkg() {
-    dpkq-query -s "$1" >/dev/null 2>&1
+    dpkg-query -s "$1" >/dev/null 2>&1
 }
 
 install_pkg() {
@@ -35,13 +34,18 @@ install_pkg() {
     sudo apt-get install -y "$1"
 }
 
+sudo unzip -o assistant_proj.zip -d /usr/share/snips
+sudo cp -r personal_kws_tpl personal_kws
+sudo cp snips.toml /etc/
+sudo cp asound.conf /etc/asound.conf
+install_pkg "snips-injection"
+
 for pkg in ${required_packages[@]}; do
     if ! check_pkg "$pkg"; then
         install_pkg "$pkg"
     fi
 done
 
-sudo unzip -o assistant_proj.zip -d /usr/share/snips
-sudo cp snips.toml /etc/
 sudo systemctl restart snips-hotword
 sudo systemctl restart snips-dialogue
+sudo systemctl restart snips-injection

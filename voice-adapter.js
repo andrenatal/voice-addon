@@ -16,7 +16,7 @@ const {Adapter, Device, Property} = require('gateway-addon');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-let token, keyword, card;
+let token, keyword;
 
 class ActiveProperty extends Property {
   constructor(device, name, propertyDescription) {
@@ -127,7 +127,7 @@ class MqttListener {
       } else if (topic === this.HERMES_KWS) {
         spawn(
           'aplay',
-          ['-D', card, 'end_spot.wav'],
+          ['end_spot.wav'],
           {cwd: __dirname}
         );
       }
@@ -306,7 +306,6 @@ function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
   checkInstallation();
   token = manifest.moziot.config.token;
   keyword = manifest.moziot.config.keyword;
-  card = manifest.moziot.config.card;
   const adapter = new VoiceAdapter(addonManager, manifest.name);
   const device = new VoiceDevice(adapter, 'voice-controller', {
     name: 'voice-controller',
