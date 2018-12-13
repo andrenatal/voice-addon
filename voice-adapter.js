@@ -177,6 +177,10 @@ class MqttListener {
   }
 
   doHTTPRequest(command, postData, callback) {
+    if (token === '') {
+      console.log(`Token not set. Aborting call`);
+      return;
+    }
     let method = 'POST';
     if (postData === null) {
       postData = '';
