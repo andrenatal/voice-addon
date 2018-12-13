@@ -135,34 +135,43 @@ class MqttListener {
   }
 
   call_commands_api(command) {
-    const postData = JSON.stringify({
-      text: command.text,
-    });
-    this.doHTTPRequest('/commands', postData);
+    try {
+      const postData = JSON.stringify({
+        text: command.text,
+      });
+      this.doHTTPRequest('/commands', postData);
+    } catch (err) {
+        console.log(`Error calling commands api: ${err}`)
+      }
   }
 
   call_things_api() {
     this.doHTTPRequest('/things', null, (response) => {
-      const json_things = JSON.parse(response);
-      const temp_things = [];
-      for (const i in json_things) {
-        for (const key in json_things[i]) {
-          if (key === 'name') {
-            temp_things.push(json_things[i][key]);
+
+      try {
+        const json_things = JSON.parse(response);
+        const temp_things = [];
+        for (const i in json_things) {
+          for (const key in json_things[i]) {
+            if (key === 'name') {
+              temp_things.push(json_things[i][key]);
+            }
           }
         }
-      }
 
-      if (JSON.stringify(temp_things.sort()) !==
-          JSON.stringify(this.things.sort())) {
-        console.log('different set of things. retrain: ');
-        const train_json = {
-          operations: [['addFromVanilla', {thing: []}]],
-        };
-        train_json.operations[0][1].thing = temp_things;
-        this.things = temp_things;
-        this.client.publish('hermes/injection/perform',
-                            JSON.stringify(train_json));
+        if (JSON.stringify(temp_things.sort()) !==
+            JSON.stringify(this.things.sort())) {
+          console.log('different set of things. retrain: ');
+          const train_json = {
+            operations: [['addFromVanilla', {thing: []}]],
+          };
+          train_json.operations[0][1].thing = temp_things;
+          this.things = temp_things;
+          this.client.publish('hermes/injection/perform',
+                              JSON.stringify(train_json));
+        }
+      } catch (err) {
+        console.log(`Error calling things api: ${err}`)
       }
     });
   }
