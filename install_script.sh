@@ -51,3 +51,5 @@ sudo cp snips.toml /etc/
 sudo systemctl restart snips-hotword
 sudo systemctl restart snips-dialogue
 sudo systemctl restart snips-injection
+echo "Setup complete"
+
