@@ -11,12 +11,13 @@
 const mqtt = require('mqtt');
 const https = require('https');
 const spawn = require('child_process').spawn;
-
+const fs = require('fs');
 const {Adapter, Device, Property} = require('gateway-addon');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-let token, keyword;
+let token, keyword, speaker, microphone;
+let pixel_ring_service;
 
 class ActiveProperty extends Property {
   constructor(device, name, propertyDescription) {
@@ -313,12 +314,80 @@ class VoiceAdapter extends Adapter {
     console.log('VoiceAdapter:', this.name, 'id', this.id,
                 'cancelRemoveThing(', device.id, ')');
   }
+
+  // cleanup
+  unload() {
+    return new Promise((resolve, reject) => {
+      if (pixel_ring_service) {
+        pixel_ring_service.stderr.pause();
+        pixel_ring_service.stdout.pause();
+        pixel_ring_service.stdin.pause();
+        pixel_ring_service.kill('SIGTERM');
+      }
+      console.log(`unloaded addon ${pixel_ring_service}`);
+      resolve();
+    })
+  }
 }
 
 function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
   checkInstallation();
   token = manifest.moziot.config.token;
   keyword = manifest.moziot.config.keyword;
+  speaker = manifest.moziot.config.speaker;
+  microphone = manifest.moziot.config.microphone;
+  console.log(`microphone ${microphone}`);
+  console.log(`speaker ${speaker}`);
+
+  let capture_pcm = "";
+  let playback_pcm = "";
+
+  if (microphone === 'Respeaker 4mics') {
+    capture_pcm = "capture.pcm { \n type plug \n slave.pcm 'hw:seeed4micvoicec' \n }"
+    console.log('verify if we need to run the respeaker installation');
+    checkRespeakerInstallation();
+    console.log('starting the pixelring daemon');
+    pixel_ring_service = spawn(
+      'python',
+      ['ring_speak.py'],
+      {cwd: __dirname}
+    );
+    pixel_ring_service.stdout.setEncoding('utf8');
+    pixel_ring_service.stdout.on('data', (data) => {
+      console.log(`pixel_rings DATA: ${data.toString()}`);
+    });
+    pixel_ring_service.stderr.on('data', (data) => {
+      console.log(`pixel_rings ERROR: ${data.toString()}`);
+    });
+    pixel_ring_service.on('close', (code) => {
+      console.log(`pixel_rings process exit code ${code}`);
+    });
+  } else {
+    capture_pcm = "capture.pcm { \n type plug \n slave.pcm 'hw:1,0' \n }"
+  }
+
+  if (speaker === 'USB') {
+    playback_pcm =  "playback.pcm { \n type plug \n slave.pcm 'hw:1,0' \n }"
+  } else {
+    playback_pcm =  "playback.pcm { \n type plug \n slave.pcm 'hw:0,0' \n }"
+  }
+
+  console.log('writing asound.conf');
+  let asound_tpl = `pcm.!default { \n type asym \n ${playback_pcm} \n ${capture_pcm} \n } \n`
+  fs.writeFileSync(`${__dirname}/asound.conf`, asound_tpl)
+  const snips_installation = spawn(
+    'bash',
+    ['install_asound.sh'],
+    {cwd: __dirname}
+  );
+  console.log('asound.conf written');
+
+  const restart_audio_server = spawn(
+    'sudo',
+    ['systemctl', 'restart', 'snips-audio-server'],
+    {cwd: __dirname}
+  );
+
   const adapter = new VoiceAdapter(addonManager, manifest.name);
   const device = new VoiceDevice(adapter, 'voice-controller', {
     name: 'voice-controller',
@@ -349,6 +418,20 @@ function checkInstallation() {
   });
   snips_installation.stderr.on('data', (data) => {
     console.log(`Error executing install_script.sh ${data}`);
+  });
+}
+
+function checkRespeakerInstallation() {
+  const snips_installation = spawn(
+    'bash',
+    ['install_respeaker.sh'],
+    {cwd: __dirname}
+  );
+  snips_installation.stdout.on('data', (data) => {
+    console.log(`DATA install_respeaker: ${data.toString()}`);
+  });
+  snips_installation.stderr.on('data', (data) => {
+    console.log(`Error executing install_respeaker.sh ${data}`);
   });
 }
 

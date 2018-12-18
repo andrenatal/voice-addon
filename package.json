@@ -1,7 +1,7 @@
 {
   "name": "voice-addon",
   "display_name": "Voice Control",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Hands-free voice addon with personalized keyword and local voice processing.",
   "author": "André Natal",
   "main": "index.js",
@@ -31,15 +31,17 @@
     "SHA256SUMS",
     "voice-adapter.js",
     "index.js",
+    "install_asound.sh",
     "install_script.sh",
+    "install_respeaker.sh",
     "end_spot.wav",
     "script_recording.py",
     "node_modules",
     "assistant_proj.zip",
     "snips.toml",
-    "asound.conf",
     "utils.py",
-    "start.wav"
+    "start.wav",
+    "ring_speak.py"
   ],
   "moziot": {
     "api": {
@@ -49,7 +51,9 @@
     "plugin": true,
     "exec": "{nodeLoader} {path}",
     "config": {
-      "keyword": "jarvis"
+      "keyword": "jarvis",
+      "speaker": "USB",
+      "microphone": "USB"
     },
     "schema": {
       "type": "object",
@@ -62,6 +66,22 @@
         "keyword": {
           "type": "string",
           "description": "Type your desired keyword. Use only characters from a to z. After clicking Apply, add your Voice Controller to your Things list, and push the button to start the training of your keyword."
+        },
+        "speaker": {
+          "type": "string",
+          "enum": [
+            "USB",
+            "Audio Jack"
+          ],
+          "default": "USB"
+        },
+        "microphone": {
+          "type": "string",
+          "enum": [
+            "USB",
+            "Respeaker 4mics"
+          ],
+          "default": "USB"
         }
       },
       "required": [

@@ -2,6 +2,11 @@
 
 set -e
 
+if [ -f "setup_complete" ]; then
+	echo "skip setup"
+	exit 1
+fi
+
 required_packages=(
     snips-platform-voice
     python-numpy
@@ -37,7 +42,6 @@ install_pkg() {
 sudo unzip -o assistant_proj.zip -d /usr/share/snips
 cp -r personal_kws_tpl personal_kws
 sudo rm -rf /etc/snips.toml
-sudo cp asound.conf /etc/asound.conf
 install_pkg "snips-injection"
 
 for pkg in ${required_packages[@]}; do
@@ -51,5 +55,6 @@ sudo cp snips.toml /etc/
 sudo systemctl restart snips-hotword
 sudo systemctl restart snips-dialogue
 sudo systemctl restart snips-injection
+touch setup_complete
 echo "Setup complete"
 
