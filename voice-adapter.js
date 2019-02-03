@@ -12,7 +12,7 @@ const mqtt = require('mqtt');
 const https = require('https');
 const spawn = require('child_process').spawn;
 const fs = require('fs');
-const {Adapter, Device, Property} = require('gateway-addon');
+const {Adapter, Device, Property, Event} = require('gateway-addon');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -103,19 +103,20 @@ class VoiceDevice extends Device {
                     deviceDescription.events[event].metadata);
     }
 
-    this.mqttListener = new MqttListener();
+    this.mqttListener = new MqttListener(this);
     this.mqttListener.connect();
   }
 }
 
 class MqttListener {
-  constructor() {
+  constructor(device) {
     // connect to snips mqtt
     this.client = mqtt.connect('mqtt://127.0.0.1');
     this.HERMES_KWS = 'hermes/hotword/default/detected';
     this.HERMES_ASR = 'hermes/asr/textCaptured';
     setInterval(this.call_things_api.bind(this), 10000);
     this.things = [];
+    this.device = device;
   }
 
   connect() {
