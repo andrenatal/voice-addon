@@ -56,6 +56,9 @@ class ActiveProperty extends Property {
         this.setCachedValue(false);
         this.device.notifyPropertyChanged(this);
       });
+      this.device.eventNotify(new Event(this.device,
+        'training',
+        'started'));
     } else {
       console.log('shutdown training');
       // shutdown training
@@ -68,6 +71,9 @@ class ActiveProperty extends Property {
     }
     return new Promise((resolve, reject) => {
       super.setValue(value).then((updatedValue) => {
+        this.device.eventNotify(new Event(this.device,
+          'training',
+          'ended'));
         resolve(updatedValue);
         this.device.notifyPropertyChanged(this);
       }).catch((err) => {
@@ -90,6 +96,13 @@ class VoiceDevice extends Device {
                                           propertyDescription);
       this.properties.set(propertyName, property);
     }
+
+    for (const event in deviceDescription.events) {
+      console.log('addedEvent', deviceDescription.events[event].name,deviceDescription.events[event].metadata);
+      this.addEvent(deviceDescription.events[event].name,
+                    deviceDescription.events[event].metadata);
+    }
+
     this.mqttListener = new MqttListener();
     this.mqttListener.connect();
   }
@@ -125,7 +138,13 @@ class MqttListener {
       if (topic === this.HERMES_ASR) {
         console.log(`mensagem no mqtt no addon ${message}`);
         this.call_commands_api(JSON.parse(message));
+        this.device.eventNotify(new Event(this.device,
+          'speechinput',
+          message));
       } else if (topic === this.HERMES_KWS) {
+        this.device.eventNotify(new Event(this.device,
+          'wakeword',
+          'detected'));
         spawn(
           'aplay',
           ['end_spot.wav'],
@@ -141,8 +160,14 @@ class MqttListener {
         text: command.text,
       });
       this.doHTTPRequest('/commands', postData);
+      this.device.eventNotify(new Event(this.device,
+        'command',
+        command.text));
     } catch (err) {
         console.log(`Error calling commands api: ${err}`)
+        this.device.eventNotify(new Event(this.device,
+          'command',
+          `Error calling commands api: ${err}`));
       }
   }
 
@@ -403,6 +428,36 @@ function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
         value: false,
       },
     },
+    events: [
+      {
+        name: 'wakeword',
+        metadata: {
+          description: 'A wakeword was deteced',
+          type: 'string',
+        },
+      },
+      {
+        name: 'speechinput',
+        metadata: {
+          description: 'A voice command was detected',
+          type: 'string',
+        },
+      },
+      {
+        name: 'command',
+        metadata: {
+          description: 'A web thing command was executed',
+          type: 'string',
+        },
+      },
+      {
+        name: 'training',
+        metadata: {
+          description: 'Wakeword training started',
+          type: 'string',
+        },
+      },
+    ],
   });
   adapter.handleDeviceAdded(device);
 }
