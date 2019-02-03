@@ -67,13 +67,13 @@ class ActiveProperty extends Property {
         this.training_process.stdout.pause();
         this.training_process.stdin.pause();
         this.training_process.kill('SIGTERM');
+        this.device.eventNotify(new Event(this.device,
+          'training',
+          'ended'));
       }
     }
     return new Promise((resolve, reject) => {
       super.setValue(value).then((updatedValue) => {
-        this.device.eventNotify(new Event(this.device,
-          'training',
-          'ended'));
         resolve(updatedValue);
         this.device.notifyPropertyChanged(this);
       }).catch((err) => {
