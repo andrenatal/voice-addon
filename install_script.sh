@@ -40,6 +40,7 @@ install_pkg() {
 }
 
 sudo unzip -o assistant_proj.zip -d /usr/share/snips
+sudo chown -R _snips:_snips /usr/share/snips/assistant/
 cp -r personal_kws_tpl personal_kws
 sudo rm -rf /etc/snips.toml
 install_pkg "snips-injection"
