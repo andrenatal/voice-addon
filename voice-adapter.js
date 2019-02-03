@@ -141,7 +141,7 @@ class MqttListener {
         this.call_commands_api(JSON.parse(message));
         this.device.eventNotify(new Event(this.device,
           'speechinput',
-          message));
+          'detected'));
       } else if (topic === this.HERMES_KWS) {
         this.device.eventNotify(new Event(this.device,
           'wakeword',
