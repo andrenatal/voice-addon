@@ -35,7 +35,6 @@ required_packages=(
 
 check_pkg() {
     pkg_="$(cut -d'_' -f1 <<<"$1")"
-    #echo "$pkg_"
     dpkg-query -s "$pkg_" >/dev/null 2>&1
 }
 
@@ -49,8 +48,8 @@ install() {
 	for pkg in ${required_packages[@]}; do
     		if ! check_pkg "$pkg"; then
 	        	dpkg -i "$pkg"
-			# TODO _ put package on hold to not update and not break
-			# echo "<package-name> hold" | sudo dpkg --set-selections
+    			pkg_name="$(cut -d'_' -f1 <<<"$pkg")"
+			echo "$pkg_name  hold" | sudo dpkg --set-selections
     		fi
 	done
 	sudo unzip -o assistant_proj.zip -d /usr/share/snips
@@ -72,7 +71,6 @@ uninstall() {
         done
 	rm -rf /usr/share/snips/
 	rm setup_complete
-	rm assistant_proj.zip
 }
 
 if [[ $1 == "install" ]]; then
