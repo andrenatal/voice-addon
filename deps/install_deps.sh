@@ -71,6 +71,7 @@ uninstall() {
         done
 	rm -rf /usr/share/snips/
 	rm setup_complete
+        echo "Uninstall complete"
 }
 
 if [[ $1 == "install" ]]; then
