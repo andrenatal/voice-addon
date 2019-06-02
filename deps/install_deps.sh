@@ -45,21 +45,24 @@ install() {
 	fi
 
 	unzip -o dependencies.zip -d .
+	sudo unzip -o assistant_proj_heysnips.zip -d /usr/share/snips
 	for pkg in ${required_packages[@]}; do
     		if ! check_pkg "$pkg"; then
-	        	dpkg -i "$pkg"
+	        	sudo dpkg -i "$pkg"
     			pkg_name="$(cut -d'_' -f1 <<<"$pkg")"
 			echo "$pkg_name  hold" | sudo dpkg --set-selections
     		fi
 	done
-	sudo unzip -o assistant_proj.zip -d /usr/share/snips
 	sudo chown -R _snips:_snips /usr/share/snips/assistant/
-
+	sudo cp snips.toml /etc/snips.toml
+        sudo cp asound.conf /etc/
 	sudo systemctl restart snips-hotword
 	sudo systemctl restart snips-dialogue
 	sudo systemctl restart snips-injection
 	rm *.deb
-	rm assistant_proj.zip
+        rm asound.conf
+	rm assistant_proj_heysnips.zip
+	rm snips.toml
 	touch setup_complete
 	echo "Setup complete"
 }
@@ -67,9 +70,9 @@ install() {
 uninstall() {
         for pkg in ${required_packages[@]}; do
      	    	pkg_="$(cut -d'_' -f1 <<<"$pkg")"
-		dpkg --purge --force-depends "$pkg_"
+		sudo dpkg --purge --force-depends "$pkg_"
         done
-	rm -rf /usr/share/snips/
+	sudo rm -rf /usr/share/snips/
 	rm setup_complete
         echo "Uninstall complete"
 }

@@ -1,7 +1,7 @@
 {
   "name": "voice-addon",
   "display_name": "Voice Control",
-  "version": "0.0.8",
+  "version": "1.0.0",
   "description": "Hands-free voice addon with personalized keyword and local voice processing.",
   "author": "André Natal",
   "main": "index.js",
@@ -31,17 +31,10 @@
     "SHA256SUMS",
     "voice-adapter.js",
     "index.js",
-    "install_asound.sh",
-    "install_script.sh",
-    "install_respeaker.sh",
-    "end_spot.wav",
-    "script_recording.py",
-    "node_modules",
-    "assistant_proj.zip",
-    "snips.toml",
-    "utils.py",
-    "start.wav",
-    "ring_speak.py"
+    "deps/install_deps.sh",
+    "deps/dependencies.zip",
+    "assets/end_spot.wav",
+    "node_modules"
   ],
   "moziot": {
     "api": {
@@ -51,7 +44,7 @@
     "plugin": true,
     "exec": "{nodeLoader} {path}",
     "config": {
-      "keyword": "mozilla gateway",
+      "keyword": "hey snips",
       "speaker": "USB",
       "microphone": "USB"
     },
@@ -65,28 +58,22 @@
         },
         "keyword": {
           "type": "string",
-          "description": "Type your desired keyword. Use only characters from a to z. After clicking Apply, add your Voice Controller to your Things list, and push the button to start the training of your keyword."
+          "enum": [
+            "hey snips"
+          ],
+          "default": "USB",
+          "description": "Keyword used to trigger the command."
         },
         "speaker": {
           "type": "string",
           "enum": [
-            "USB",
-            "Audio Jack"
-          ],
-          "default": "USB"
-        },
-        "microphone": {
-          "type": "string",
-          "enum": [
-            "USB",
-            "Respeaker 4mics"
+            "USB"
           ],
           "default": "USB"
         }
       },
       "required": [
-        "token",
-        "keyword"
+        "token"
       ]
     }
   },

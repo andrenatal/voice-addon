@@ -149,7 +149,7 @@ class MqttListener {
         spawn(
           'aplay',
           ['end_spot.wav'],
-          {cwd: __dirname}
+          {cwd: __dirname + "/assets"}
         );
       }
     }.bind(this));
@@ -351,7 +351,21 @@ class VoiceAdapter extends Adapter {
         pixel_ring_service.kill('SIGTERM');
       }
       console.log(`unloaded addon ${pixel_ring_service}`);
-      resolve();
+      const snips_uninstall = spawn(
+        'bash',
+        ['install_deps.sh', 'uninstall'],
+        {cwd: __dirname + '/deps'}
+      );
+      snips_uninstall.stdout.on('data', (data) => {
+        console.log(`DATA snips_uninstall: ${data.toString()}`);
+      });
+      snips_uninstall.stderr.on('data', (data) => {
+        console.log(`Error executing install_script.sh ${data}`);
+      });
+      snips_uninstall.on('close', (code) => {
+        console.log(`End of snips_uninstall ${code}`);
+        resolve();
+      });
     })
   }
 }
@@ -466,8 +480,8 @@ function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
 function checkInstallation() {
   const snips_installation = spawn(
     'bash',
-    ['install_script.sh'],
-    {cwd: __dirname}
+    ['install_deps.sh', 'install'],
+    {cwd: __dirname + '/deps'}
   );
   snips_installation.stdout.on('data', (data) => {
     console.log(`DATA snips_installation: ${data.toString()}`);
