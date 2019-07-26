@@ -4,12 +4,6 @@ set -e
 
 required_packages=(
   libportaudio2_19.6.0-1_armhf.deb
-  python-ply_3.9-1_all.deb
-  python-pycparser_2.17-2_all.deb
-  python-cffi_1.9.1-2_all.deb
-  python-soundfile_0.8.1-2_all.deb
-  python-numpy_1.1.12.1-3_armhf.deb
-  python-pyaudio_0.2.11-1_armhf.deb
   libwebsockets8_2.0.3-2+b1~rpt1_armhf.deb
   mosquitto_1.4.10-3+deb9u4_armhf.deb
   snips-platform-common_0.63.2_armhf.deb
@@ -23,6 +17,15 @@ required_packages=(
   snips-platform-voice_0.63.2_armhf.deb
   snips-tts_0.63.2_armhf.deb
   snips-watch_0.63.2_armhf.deb
+)
+
+required_packages_python=(
+  python-ply
+  python-pycparser
+  python-soundfile
+  python-numpy
+  python-pyaudio
+  python-cffi
 )
 
 check_pkg() {
@@ -50,7 +53,7 @@ install() {
 	sudo dpkg -i libttspico-utils_1.0+git20130326-9_armhf.deb 
 	rm libttspico*.deb
 
-	sudo apt install libgfortran3
+	sudo apt install libgfortran3 || true
 	sudo apt install libatlas3-base=3.10.3-8+rpi1
 
 	unzip -o dependencies.zip -d .
@@ -62,6 +65,9 @@ install() {
 			echo "$pkg_name  hold" | sudo dpkg --set-selections
     		fi
 	done
+        for pkg in ${required_packages_python[@]}; do
+                sudo apt-get install -y "$pkg"
+        done
 	sudo chown -R _snips:_snips /usr/share/snips/assistant/
 	sudo cp snips.toml /etc/snips.toml
         sudo cp asound.conf /etc/
