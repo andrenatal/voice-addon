@@ -7,15 +7,7 @@ required_packages=(
   python-ply_3.9-1_all.deb
   python-pycparser_2.17-2_all.deb
   python-cffi_1.9.1-2_all.deb
-  libgfortran3_6.3.0-18+rpi1+deb9u1_armhf.deb
-  libblas-common_3.7.0-2_armhf.deb
-  libatlas3-base_3.10.3-1-snips_armhf.deb
-  libblas3_3.7.0-2_armhf.deb
   python-soundfile_0.8.1-2_all.deb
-  liblapack3_3.7.0-2_armhf.deb
-  libttspico-data_1.0+git20130326-5_all.deb
-  libttspico0_1.0+git20130326-5_armhf.deb
-  libttspico-utils_1.0+git20130326-5_armhf.deb
   python-numpy_1.1.12.1-3_armhf.deb
   python-pyaudio_0.2.11-1_armhf.deb
   libwebsockets8_2.0.3-2+b1~rpt1_armhf.deb
@@ -43,6 +35,23 @@ install() {
     		echo "skip setup"
     		exit 1
 	fi
+
+	sudo apt-get update --allow-releaseinfo-change
+	sudo apt-get install -y dirmngr
+	sudo bash -c 'echo "deb https://raspbian.snips.ai/stretch stable main" > /etc/apt/sources.list.d/snips.list'
+	sudo apt-key adv --keyserver pgp.mit.edu --recv-keys D4F50CDCA10A2849
+	sudo apt-get update
+
+	wget http://ftp.fr.debian.org/debian/pool/non-free/s/svox/libttspico-data_1.0+git20130326-9_armhf.deb
+	wget http://ftp.fr.debian.org/debian/pool/non-free/s/svox/libttspico-utils_1.0+git20130326-9_armhf.deb
+	wget http://ftp.fr.debian.org/debian/pool/non-free/s/svox/libttspico0_1.0+git20130326-9_armhf.deb
+	sudo dpkg -i libttspico-data_1.0+git20130326-9_all.deb 
+	sudo dpkg -i libttspico0_1.0+git20130326-9_armhf.deb 
+	sudo dpkg -i libttspico-utils_1.0+git20130326-9_armhf.deb 
+	rm libttspico*.deb
+
+	sudo apt install libgfortran3
+	sudo apt install libatlas3-base=3.10.3-8+rpi1
 
 	unzip -o dependencies.zip -d .
 	sudo unzip -o assistant_proj_heysnips.zip -d /usr/share/snips
