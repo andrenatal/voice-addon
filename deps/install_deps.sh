@@ -72,9 +72,6 @@ uninstall() {
      	    	pkg_="$(cut -d'_' -f1 <<<"$pkg")"
 		sudo dpkg --purge --force-depends "$pkg_"
         done
-        for pkg in ${required_packages_common[@]}; do
-                sudo apt-get purge -y "$pkg"
-        done
 
 	sudo rm -rf /usr/share/snips/
 	rm setup_complete
