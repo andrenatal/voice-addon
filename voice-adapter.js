@@ -180,7 +180,7 @@ class MqttListener {
         const temp_things = [];
         for (const i in json_things) {
           for (const key in json_things[i]) {
-            if (key === 'name') {
+            if (key === 'title') {
               temp_things.push(json_things[i][key]);
             }
           }
