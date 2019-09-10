@@ -1,7 +1,7 @@
 {
   "name": "voice-addon",
   "display_name": "Voice Control",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Hands-free voice addon with personalized keyword and local voice processing.",
   "author": "André Natal",
   "main": "index.js",
