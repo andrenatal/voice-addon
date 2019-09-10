@@ -382,27 +382,7 @@ function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
   let capture_pcm = "";
   let playback_pcm = "";
 
-  if (microphone === 'Respeaker 4mics') {
-    capture_pcm = "capture.pcm { \n type plug \n slave.pcm 'hw:seeed4micvoicec' \n }"
-    console.log('verify if we need to run the respeaker installation');
-    checkRespeakerInstallation();
-    console.log('starting the pixelring daemon');
-    pixel_ring_service = spawn(
-      'python',
-      ['ring_speak.py'],
-      {cwd: __dirname}
-    );
-    pixel_ring_service.stdout.setEncoding('utf8');
-    pixel_ring_service.stdout.on('data', (data) => {
-      console.log(`pixel_rings DATA: ${data.toString()}`);
-    });
-    pixel_ring_service.stderr.on('data', (data) => {
-      console.log(`pixel_rings ERROR: ${data.toString()}`);
-    });
-    pixel_ring_service.on('close', (code) => {
-      console.log(`pixel_rings process exit code ${code}`);
-    });
-  } else {
+  if (microphone === 'USB') {
     capture_pcm = "capture.pcm { \n type plug \n slave.pcm 'hw:1,0' \n }"
   }
 
@@ -488,20 +468,6 @@ function checkInstallation() {
   });
   snips_installation.stderr.on('data', (data) => {
     console.log(`Error executing install_script.sh ${data}`);
-  });
-}
-
-function checkRespeakerInstallation() {
-  const snips_installation = spawn(
-    'bash',
-    ['install_respeaker.sh'],
-    {cwd: __dirname}
-  );
-  snips_installation.stdout.on('data', (data) => {
-    console.log(`DATA install_respeaker: ${data.toString()}`);
-  });
-  snips_installation.stderr.on('data', (data) => {
-    console.log(`Error executing install_respeaker.sh ${data}`);
   });
 }
 
