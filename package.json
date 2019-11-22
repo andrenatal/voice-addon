@@ -1,7 +1,7 @@
 {
   "name": "voice-addon",
   "display_name": "Voice Control",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Hands-free voice addon with personalized keyword and local voice processing.",
   "author": "André Natal",
   "main": "index.js",
@@ -24,16 +24,19 @@
     "url": "https://github.com/andrenatal/voice-addon/issues"
   },
   "devDependencies": {
-    "eslint": "^5.10.0"
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.7.0"
   },
   "files": [
     "LICENSE",
+    "README.md",
     "SHA256SUMS",
     "voice-adapter.js",
     "index.js",
     "deps/install_deps.sh",
     "deps/dependencies.zip",
     "assets/end_spot.wav",
+    "manifest.json",
     "node_modules"
   ],
   "moziot": {

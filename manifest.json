@@ -1,0 +1,54 @@
+{
+  "author": "Andr\u00e9 Natal",
+  "description": "Hands-free voice addon with personalized keyword and local voice processing.",
+  "gateway_specific_settings": {
+    "webthings": {
+      "exec": "{nodeLoader} {path}",
+      "primary_type": "adapter",
+      "strict_max_version": "*",
+      "strict_min_version": "0.10.0"
+    }
+  },
+  "homepage_url": "https://github.com/andrenatal/voice-addon",
+  "id": "voice-addon",
+  "license": "MPL-2.0",
+  "manifest_version": 1,
+  "name": "Voice Control",
+  "options": {
+    "default": {
+      "keyword": "hey snips",
+      "speaker": "USB",
+      "microphone": "USB"
+    },
+    "schema": {
+      "type": "object",
+      "description": "Configuration for your voice addon",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "Navigate to Settings -> Developer -> Create local authorization -> Allow. Then copy the presented JSON Web Token in this field"
+        },
+        "keyword": {
+          "type": "string",
+          "enum": [
+            "hey snips"
+          ],
+          "default": "USB",
+          "description": "Keyword used to trigger the command."
+        },
+        "speaker": {
+          "type": "string",
+          "enum": [
+            "USB"
+          ],
+          "default": "USB"
+        }
+      },
+      "required": [
+        "token"
+      ]
+    }
+  },
+  "short_name": "Voice",
+  "version": "1.0.2"
+}
