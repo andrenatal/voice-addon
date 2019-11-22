@@ -12,6 +12,7 @@ const mqtt = require('mqtt');
 const https = require('https');
 const spawn = require('child_process').spawn;
 const fs = require('fs');
+const path = require('path');
 const {Adapter, Device, Property, Event} = require('gateway-addon');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -57,8 +58,8 @@ class ActiveProperty extends Property {
         this.device.notifyPropertyChanged(this);
       });
       this.device.eventNotify(new Event(this.device,
-        'training',
-        'started'));
+                                        'training',
+                                        'started'));
     } else {
       console.log('shutdown training');
       // shutdown training
@@ -68,8 +69,8 @@ class ActiveProperty extends Property {
         this.training_process.stdin.pause();
         this.training_process.kill('SIGTERM');
         this.device.eventNotify(new Event(this.device,
-          'training',
-          'ended'));
+                                          'training',
+                                          'ended'));
       }
     }
     return new Promise((resolve, reject) => {
@@ -98,7 +99,11 @@ class VoiceDevice extends Device {
     }
 
     for (const event in deviceDescription.events) {
-      console.log('addedEvent', deviceDescription.events[event].name,deviceDescription.events[event].metadata);
+      console.log(
+        'addedEvent',
+        deviceDescription.events[event].name,
+        deviceDescription.events[event].metadata
+      );
       this.addEvent(deviceDescription.events[event].name,
                     deviceDescription.events[event].metadata);
     }
@@ -140,16 +145,16 @@ class MqttListener {
         console.log(`mensagem no mqtt no addon ${message}`);
         this.call_commands_api(JSON.parse(message));
         this.device.eventNotify(new Event(this.device,
-          'speechinput',
-          'detected'));
+                                          'speechinput',
+                                          'detected'));
       } else if (topic === this.HERMES_KWS) {
         this.device.eventNotify(new Event(this.device,
-          'wakeword',
-          'detected'));
+                                          'wakeword',
+                                          'detected'));
         spawn(
           'aplay',
           ['end_spot.wav'],
-          {cwd: __dirname + "/assets"}
+          {cwd: path.join(__dirname, 'assets')}
         );
       }
     }.bind(this));
@@ -162,19 +167,18 @@ class MqttListener {
       });
       this.doHTTPRequest('/commands', postData);
       this.device.eventNotify(new Event(this.device,
-        'command',
-        command.text));
+                                        'command',
+                                        command.text));
     } catch (err) {
-        console.log(`Error calling commands api: ${err}`)
-        this.device.eventNotify(new Event(this.device,
-          'command',
-          `Error calling commands api: ${err}`));
-      }
+      console.log(`Error calling commands api: ${err}`);
+      this.device.eventNotify(new Event(this.device,
+                                        'command',
+                                        `Error calling commands api: ${err}`));
+    }
   }
 
   call_things_api() {
     this.doHTTPRequest('/things', null, (response) => {
-
       try {
         const json_things = JSON.parse(response);
         const temp_things = [];
@@ -198,7 +202,7 @@ class MqttListener {
                               JSON.stringify(train_json));
         }
       } catch (err) {
-        console.log(`Error calling things api: ${err}`)
+        console.log(`Error calling things api: ${err}`);
       }
     });
   }
@@ -343,7 +347,7 @@ class VoiceAdapter extends Adapter {
 
   // cleanup
   unload() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (pixel_ring_service) {
         pixel_ring_service.stderr.pause();
         pixel_ring_service.stdout.pause();
@@ -354,7 +358,7 @@ class VoiceAdapter extends Adapter {
       const snips_uninstall = spawn(
         'bash',
         ['install_deps.sh', 'uninstall'],
-        {cwd: __dirname + '/deps'}
+        {cwd: path.join(__dirname, 'deps')}
       );
       snips_uninstall.stdout.on('data', (data) => {
         console.log(`DATA snips_uninstall: ${data.toString()}`);
@@ -366,7 +370,7 @@ class VoiceAdapter extends Adapter {
         console.log(`End of snips_uninstall ${code}`);
         resolve();
       });
-    })
+    });
   }
 }
 
@@ -379,34 +383,24 @@ function loadVoiceAdapter(addonManager, manifest, _errorCallback) {
   console.log(`microphone ${microphone}`);
   console.log(`speaker ${speaker}`);
 
-  let capture_pcm = "";
-  let playback_pcm = "";
+  let capture_pcm = '';
+  let playback_pcm = '';
 
   if (microphone === 'USB') {
-    capture_pcm = "capture.pcm { \n type plug \n slave.pcm 'hw:1,0' \n }"
+    capture_pcm = 'capture.pcm { \n type plug \n slave.pcm \'hw:1,0\' \n }';
   }
 
   if (speaker === 'USB') {
-    playback_pcm =  "playback.pcm { \n type plug \n slave.pcm 'hw:1,0' \n }"
+    playback_pcm = 'playback.pcm { \n type plug \n slave.pcm \'hw:1,0\' \n }';
   } else {
-    playback_pcm =  "playback.pcm { \n type plug \n slave.pcm 'hw:0,0' \n }"
+    playback_pcm = 'playback.pcm { \n type plug \n slave.pcm \'hw:0,0\' \n }';
   }
 
   console.log('writing asound.conf');
-  let asound_tpl = `pcm.!default { \n type asym \n ${playback_pcm} \n ${capture_pcm} \n } \n`
-  fs.writeFileSync(`${__dirname}/asound.conf`, asound_tpl)
-  const snips_installation = spawn(
-    'bash',
-    ['install_asound.sh'],
-    {cwd: __dirname}
-  );
+  const asound_tpl =
+    `pcm.!default { \n type asym \n ${playback_pcm} \n ${capture_pcm} \n } \n`;
+  fs.writeFileSync(path.join(__dirname, 'asound.conf'), asound_tpl);
   console.log('asound.conf written');
-
-  const restart_audio_server = spawn(
-    'sudo',
-    ['systemctl', 'restart', 'snips-audio-server'],
-    {cwd: __dirname}
-  );
 
   const adapter = new VoiceAdapter(addonManager, manifest.name);
   const device = new VoiceDevice(adapter, 'voice-controller', {
@@ -461,7 +455,7 @@ function checkInstallation() {
   const snips_installation = spawn(
     'bash',
     ['install_deps.sh', 'install'],
-    {cwd: __dirname + '/deps'}
+    {cwd: path.join(__dirname, 'deps')}
   );
   snips_installation.stdout.on('data', (data) => {
     console.log(`DATA snips_installation: ${data.toString()}`);
